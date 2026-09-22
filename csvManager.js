@@ -49,12 +49,6 @@ function addCategory(name) {
     categories.push(name);
 }
 
-function deleteAll() {
-    items = [];
-    fs.writeFileSync('data.csv', HEADERS + '\n', 'utf-8');
-}
-
-
 function updateStatus(id) {
     items.forEach(item => {
         if (item.id == id) {
@@ -127,7 +121,6 @@ module.exports = {
     getItems,
     addItem,
     addCategory,
-    deleteAll,
     updateStatus,
     updateUrgent,
     sortBy,
