@@ -1,8 +1,10 @@
 let id = 0;
 
+const FILE = 'items.csv';
+
 const fs = require('fs');
 
-const fileData = fs.readFileSync('data.csv', 'utf-8');
+const fileData = fs.readFileSync(FILE, 'utf-8');
 
 const lines = fileData.trim().split(/\r?\n/);
 
@@ -28,7 +30,7 @@ function getItems() {
 
 function writeToFile() {
     const rows = items.map(item => Object.values(item).join(',')).join('\n');
-    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');    
+    fs.writeFileSync(FILE, HEADERS + '\n' + rows + '\n', 'utf-8');    
 }
 
 function addItem(name, category, date=null, status="incomplete", urgent="nonurgent") {
@@ -38,7 +40,7 @@ function addItem(name, category, date=null, status="incomplete", urgent="nonurge
 
     id++;
     const row = Object.values(item).join(',') + '\n';
-    fs.appendFileSync('data.csv', row, 'utf-8');
+    fs.appendFileSync(FILE, row, 'utf-8');
 
 }
 
@@ -107,7 +109,7 @@ function updateItem(id, field, newValue) {
 }
 
 function updateItems() {
-    const updatedFileData = fs.readFileSync('data.csv', 'utf-8');
+    const updatedFileData = fs.readFileSync(FILE, 'utf-8');
 
     const updatedLines = updatedFileData.trim().split(/\r?\n/);
 

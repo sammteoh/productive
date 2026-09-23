@@ -1,9 +1,13 @@
 const { HEADERS, getItems, addItem, addCategory, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, updateItem } = require('./csvManager');
 
+let lists = [];
 let categories = ["Life", "School"];
 
 function renderButtons(containerId, categories) {
+    // Adding a new item button container
     const buttonContainer = document.getElementById(containerId);
+
+    const addItemButtonContainer = document.createElement('div');
 
     const itemInput = Object.assign(document.createElement('input'), {
         id: 'item-input',
@@ -44,11 +48,45 @@ function renderButtons(containerId, categories) {
         itemInput.value = "";
     });
 
+    // Adding a new list button container
+    const addListButtonContainer = document.createElement('div');
 
-    buttonContainer.appendChild(itemInput);
-    buttonContainer.appendChild(categorySelect);
-    buttonContainer.appendChild(dateSelect);
-    buttonContainer.appendChild(addButton);
+    const listInput = Object.assign(document.createElement('input'), {
+        id: 'list-input',
+        type: 'text',
+        placeholder: 'Enter list.'
+    });
+
+    const addListButton = Object.assign(document.createElement('button'), {
+        id: 'add-list-button',
+        type: 'button',
+        textContent: 'Add'
+    });
+
+
+    addListButton.addEventListener('click', () => {
+        if (listInput.value == "") {
+            throw new Error("Invalid input.")
+        }
+
+        lists.push(listInput.value);
+        renderPage();
+        listInput.value = "";
+
+        console.log(lists);
+    });
+
+
+    addItemButtonContainer.appendChild(itemInput);
+    addItemButtonContainer.appendChild(categorySelect);
+    addItemButtonContainer.appendChild(dateSelect);
+    addItemButtonContainer.appendChild(addButton);
+
+    addListButtonContainer.appendChild(listInput);
+    addListButtonContainer.appendChild(addListButton);
+
+    buttonContainer.appendChild(addItemButtonContainer);
+    buttonContainer.appendChild(addListButtonContainer);
 
 }
 
