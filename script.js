@@ -63,11 +63,28 @@ function renderFullTable(category, containerId) {
     const completeContainer = document.createElement('div');
     completeContainer.id = `${category.toLowerCase()}-complete-container`;
 
+    const completeToggleBtn = document.createElement('button');
+    completeToggleBtn.type = 'toggle';
+    completeToggleBtn.textContent = `Hide Completed (${completeItems.length})`
+
+    completeToggleBtn.addEventListener('click', () => {
+        const isHidden = completeContainer.style.display === "none";
+
+        if (isHidden) {
+            completeContainer.style.display = "block";
+            completeToggleBtn.textContent = `Hide Completed (${completeItems.length})`
+        } else {
+            completeContainer.style.display = "none";
+            completeToggleBtn.textContent = `Show Completed (${completeItems.length})`
+        }
+    })
+
     const incompleteContainer = document.createElement('div');
     incompleteContainer.id = `${category.toLowerCase()}-incomplete-container`;
 
-    container.appendChild(completeContainer);
     container.appendChild(incompleteContainer);
+    container.appendChild(completeContainer);
+    container.appendChild(completeToggleBtn);       
 
     renderTable(completeItems, completeContainer.id);
     renderTable(incompleteItems, incompleteContainer.id);
