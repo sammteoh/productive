@@ -92,18 +92,15 @@ function renderTable(tableItems, containerId) {
     table.appendChild(headerRow);
 
     tableItems.forEach(item => {
-        const row = document.createElement("tr");
+        const row = document.createElement('tr');
 
-        Object.values(item).forEach(value => {
-            const cell = document.createElement("td");
+        HEADERS.forEach(header => {
+            const cell = document.createElement('td');
+            const value = item[header];
 
-            // Converts the "true" and "false" into checkboxes
-            
-            if (String(value) == "complete" || String(value) == "incomplete") {
-                const checkStatusCell = document.createElement("td");
+            if (header == "status") {
                 const checkStatusInput = document.createElement("input");
                 checkStatusInput.type = "checkbox";
-
                 checkStatusInput.checked = (item.status === "complete");
 
                 checkStatusInput.addEventListener('change', (e) => {
@@ -112,32 +109,25 @@ function renderTable(tableItems, containerId) {
                     renderPage();
                 });
 
-                checkStatusCell.appendChild(checkStatusInput);
-
-                row.appendChild(checkStatusCell);
-            } else if (String(value) == "urgent" || String(value) == "nonurgent") {
-                const checkUrgentCell = document.createElement("td");
+                cell.appendChild(checkStatusInput);
+            } else if (header == "urgent") {
                 const checkUrgentInput = document.createElement("input");
                 checkUrgentInput.type = "checkbox";
-
                 checkUrgentInput.checked = (item.urgent === "urgent");
 
                 checkUrgentInput.addEventListener('change', (e) => {
-
                     updateUrgent(item.id);
                     sortBy('date');
                     renderPage();
                 });
 
-                checkUrgentCell.appendChild(checkUrgentInput);
-
-                row.appendChild(checkUrgentCell);
+                cell.appendChild(checkUrgentInput);    
             } else {
                 cell.textContent = value;
-                row.appendChild(cell);
-
             }
-        });
+
+            row.appendChild(cell);
+        })
 
         const deleteCell = document.createElement('td');
         const deleteButton = document.createElement('button');
@@ -153,7 +143,6 @@ function renderTable(tableItems, containerId) {
 
         table.appendChild(row);
     })
-
 
     container.innerHTML = "";
     container.appendChild(table);
