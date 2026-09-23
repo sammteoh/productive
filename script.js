@@ -122,6 +122,37 @@ function renderTable(tableItems, containerId) {
                 });
 
                 cell.appendChild(checkUrgentInput);    
+            } else if (header == "name" || header == "date") {
+                cell.textContent = value
+                
+                cell.addEventListener('click', function makeEditable() {
+                    if (cell.querySelector('input')) return;
+
+                    const input = document.createElement('input');
+                    input.type = (header === "date") ? "date" : "text";
+                    input.value = value
+
+                    cell.textContent = "";
+                    cell.appendChild(input);
+                    input.focus();
+
+                    const saveChange = () => {
+                        const newValue = input.value.trim();
+                        if (newValue !== value) {
+                            updateItem(item.id, header, newValue);
+                            sortBy("date");
+                        }
+                        renderPage();
+                    };
+
+                    input.addEventListener('blur', saveChange);
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') {
+                            input.blur();
+                        }
+                    });
+                });
+
             } else {
                 cell.textContent = value;
             }
