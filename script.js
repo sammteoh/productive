@@ -1,4 +1,4 @@
-const { HEADERS, getItems, addItem, addCategory, updateStatus, updateUrgent, sortBy, updateItems, deleteItem } = require('./csvManager');
+const { HEADERS, getItems, addItem, addCategory, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, updateItem } = require('./csvManager');
 
 let categories = ["Life", "School"];
 
@@ -204,4 +204,11 @@ plans:
 - add a due date
 - every time you add a category, a new "compelte and incomplete" table set is created
 - urgent? yes/no
+
+- edit an item in place (edit the name, date, etc.)
+- clear the completed tasks
+- show and hide the completed table
+- option to create a bunch of different lists
+- instead of 'category', make lists with each their own category
+- different views
 */

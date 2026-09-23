@@ -23,8 +23,12 @@ let items = lines.slice(1).map(line => {
 function getItems() {
 
     updateItems();
-
     return items;
+}
+
+function writeToFile() {
+    const rows = items.map(item => Object.values(item).join(',')).join('\n');
+    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');    
 }
 
 function addItem(name, category, date=null, status="incomplete", urgent="nonurgent") {
@@ -41,8 +45,7 @@ function addItem(name, category, date=null, status="incomplete", urgent="nonurge
 function deleteItem(id) {
     items = items.filter(item => item.id != id);
 
-    const rows = items.map(item => Object.values(item).join(',')).join('\n');
-    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');
+    writeToFile();
 }
 
 function addCategory(name) {
@@ -60,9 +63,7 @@ function updateStatus(id) {
         }
     })
 
-    const rows = items.map(item => Object.values(item).join(',')).join('\n');
-
-    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');
+    writeToFile();
 }
 
 function updateUrgent(id) {
@@ -76,9 +77,7 @@ function updateUrgent(id) {
         }
     })
 
-    const rows = items.map(item => Object.values(item).join(',')).join('\n');
-
-    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');
+    writeToFile();
 }
 
 function sortBy(option) {
@@ -94,9 +93,17 @@ function sortBy(option) {
         return new Date(a.date) - new Date(b.date);
     });
 
-    const rows = items.map(item => Object.values(item).join(',')).join('\n');
+    writeToFile();
+}
 
-    fs.writeFileSync('data.csv', HEADERS + '\n' + rows + '\n', 'utf-8');
+function updateItem(id, field, newValue) {
+    items.forEach(item => {
+        if (item.id === id) {
+            item[field] = newValue;
+        }
+    });
+
+    writeToFile();
 }
 
 function updateItems() {
@@ -125,5 +132,6 @@ module.exports = {
     updateUrgent,
     sortBy,
     updateItems,
-    deleteItem
+    deleteItem,
+    updateItem,
 }
