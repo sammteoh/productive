@@ -1,9 +1,8 @@
-const { HEADERS, getItems, addItem, addCategory, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, updateItem } = require('./csvManager');
+const { HEADERS, getItems, getLists, addItem, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, deleteList, updateItem, addList } = require('./csvManager');
 
-let lists = [];
-let categories = ["Life", "School"];
+let lists = getLists();
 
-function renderButtons(containerId, categories) {
+function renderButtons(containerId) {
     // Adding a new item button container
     const buttonContainer = document.getElementById(containerId);
 
@@ -15,14 +14,14 @@ function renderButtons(containerId, categories) {
         placeholder: 'Enter item.'
     });
 
-    const categorySelect = document.createElement('select');
-    categorySelect.id = 'category-select';
+    const listSelect = document.createElement('select');
+    listSelect.id = 'list-select';
 
-    categories.forEach(category => {
+    lists.forEach(list => {
         const option = document.createElement('option');
-        option.value = category.toLowerCase();
-        option.textContent = category;
-        categorySelect.appendChild(option);
+        option.value = list.name.toLowerCase();
+        option.textContent = list.name;
+        listSelect.appendChild(option);
     });
 
     const dateSelect = Object.assign(document.createElement('input'), {
@@ -38,11 +37,11 @@ function renderButtons(containerId, categories) {
 
 
     addButton.addEventListener('click', () => {
-        if (itemInput.value == "" || categorySelect.value == "") {
+        if (itemInput.value == "" || listSelect.value == "") {
             throw new Error("Invalid input.")
         }
 
-        addItem(itemInput.value, categorySelect.value, dateSelect.value);
+        addItem(itemInput.value, listSelect.value, dateSelect.value);
         sortBy("date");
         renderPage();
         itemInput.value = "";
@@ -63,22 +62,20 @@ function renderButtons(containerId, categories) {
         textContent: 'Add'
     });
 
-
     addListButton.addEventListener('click', () => {
         if (listInput.value == "") {
             throw new Error("Invalid input.")
         }
 
-        lists.push(listInput.value);
+        addList(listInput.value);
+        lists = getLists();
         renderPage();
         listInput.value = "";
-
-        console.log(lists);
     });
 
 
     addItemButtonContainer.appendChild(itemInput);
-    addItemButtonContainer.appendChild(categorySelect);
+    addItemButtonContainer.appendChild(listSelect);
     addItemButtonContainer.appendChild(dateSelect);
     addItemButtonContainer.appendChild(addButton);
 
@@ -90,19 +87,18 @@ function renderButtons(containerId, categories) {
 
 }
 
-function renderFullTable(category, containerId) {
+function renderFullTable(list, containerId) {
     const container = document.getElementById(containerId);
 
-    const categoryItems = getItems().filter(item => item.category == category.toLowerCase());
+    const listItems = getItems().filter(item => item.list == list.name.toLowerCase());
 
-    const completeItems = categoryItems.filter(item => item.status == "complete");
-    const incompleteItems = categoryItems.filter(item => item.status == "incomplete");
+    const completeItems = listItems.filter(item => item.status == "complete");
+    const incompleteItems = listItems.filter(item => item.status == "incomplete");
 
     const completeContainer = document.createElement('div');
-    completeContainer.id = `${category.toLowerCase()}-complete-container`;
+    completeContainer.id = `${list.name.toLowerCase()}-complete-container`;
 
     const completeToggleBtn = document.createElement('button');
-    completeToggleBtn.type = 'toggle';
     completeToggleBtn.textContent = `Hide Completed (${completeItems.length})`
 
     completeToggleBtn.addEventListener('click', () => {
@@ -118,7 +114,7 @@ function renderFullTable(category, containerId) {
     })
 
     const incompleteContainer = document.createElement('div');
-    incompleteContainer.id = `${category.toLowerCase()}-incomplete-container`;
+    incompleteContainer.id = `${list.name.toLowerCase()}-incomplete-container`;
 
     container.appendChild(incompleteContainer);
     container.appendChild(completeContainer);
@@ -235,6 +231,7 @@ function renderTable(tableItems, containerId) {
 }
 
 function renderPage() {
+    let lists = getLists();
     const container = document.getElementById('container');
     container.innerHTML = "";
 
@@ -247,20 +244,29 @@ function renderPage() {
     container.appendChild(buttonContainer);
     container.appendChild(tableContainer)
 
-    renderButtons(buttonContainer.id, categories);
+    renderButtons(buttonContainer.id);
 
-    categories.forEach(category => {
-        const categoryContainer = document.createElement('div');
-        categoryContainer.id = `${category.toLowerCase()}-container`;
+    lists.forEach(list => {
+        const listContainer = document.createElement('div');
+        listContainer.id = `${list.name.toLowerCase()}-container`;
 
-        const categoryHeading = document.createElement('h2');
-        categoryHeading.textContent = `${category.toUpperCase()}`;
+        const listHeading = document.createElement('h2');
+        listHeading.textContent = `${list.name.toUpperCase()}`;
 
-        categoryContainer.appendChild(categoryHeading);
+        const deleteButton = document.createElement('button');
+        
+        deleteButton.textContent = 'x';
+        deleteButton.addEventListener('click', () => {
+            deleteList(list.id);
+            renderPage();
+        });
 
-        tableContainer.appendChild(categoryContainer);
+        listContainer.appendChild(listHeading);
+        listContainer.appendChild(deleteButton);
 
-        renderFullTable(category, categoryContainer.id);
+        tableContainer.appendChild(listContainer);
+
+        renderFullTable(list, listContainer.id);
     });
 }
 

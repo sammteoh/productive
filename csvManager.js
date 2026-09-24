@@ -1,47 +1,75 @@
-let id = 0;
+let item_id = 0;
+let list_id = 0;
 
-const FILE = 'items.csv';
+const ITEM_FILE = 'items.csv';
+const LIST_FILE = 'lists.csv';
 
 const fs = require('fs');
 
-const fileData = fs.readFileSync(FILE, 'utf-8');
+const itemFileData = fs.readFileSync(ITEM_FILE, 'utf-8');
+const listFileData = fs.readFileSync(LIST_FILE, 'utf-8');
 
-const lines = fileData.trim().split(/\r?\n/);
+const lines = itemFileData.trim().split(/\r?\n/);
+const listLines = listFileData.trim().split(/\r?\n/);
 
-const HEADERS = ['id', 'name', 'status', 'urgent', 'category', 'date'];
+const HEADERS = ['id', 'name', 'status', 'urgent', 'list', 'date'];
+const LIST_HEADERS = ['id', 'name'];
 
-let items = lines.slice(1).map(line => {
-    const values = line.split(',').map(value => value.trim());
-    const obj = {};
+function readCsv(filename, headers) {
+    if (!fs.existsSync(filename)) {
+        fs.writeFileSync(filename, headers.join(',') + '\n', 'utf-8');
+        return [];
+    }
 
-    HEADERS.forEach((header, index) => {
-        obj[header] = values[index];
+    const fileData = fs.readFileSync(filename, 'utf-8');
+    const lines = fileData.trim().split(/\r?\n/).filter(line => line.trim() !== '');
+
+    return lines.slice(1).map(line => {
+        const values = line.split(',').map(value => value.trim());
+        const obj = {};
+        headers.forEach((header, index) => {
+            obj[header] = values[index]
+        });
+        return obj;
     });
+}
 
-    id++;
-    return obj;
-})
+let items = readCsv(ITEM_FILE, HEADERS);
+let lists = readCsv(LIST_FILE, LIST_HEADERS);
 
 function getItems() {
-
     updateItems();
     return items;
 }
 
-function writeToFile() {
-    const rows = items.map(item => Object.values(item).join(',')).join('\n');
-    fs.writeFileSync(FILE, HEADERS + '\n' + rows + '\n', 'utf-8');    
+function getLists() {
+    updateLists();
+    return lists;
 }
 
-function addItem(name, category, date=null, status="incomplete", urgent="nonurgent") {
-    const item = {id: id, name: name, status: status, urgent: urgent, category: category, date: date};
+function writeToFile() {
+    const rows = items.map(item => Object.values(item).join(',')).join('\n');
+    fs.writeFileSync(ITEM_FILE, HEADERS + '\n' + rows + '\n', 'utf-8');    
+}
+
+function addItem(name, list, date=null, status="incomplete", urgent="nonurgent") {
+    const item = {id: item_id, name: name, status: status, urgent: urgent, list: list, date: date};
 
     items.push(item);
+    item_id++;
 
-    id++;
     const row = Object.values(item).join(',') + '\n';
-    fs.appendFileSync(FILE, row, 'utf-8');
+    fs.appendFileSync(ITEM_FILE, row, 'utf-8');
+}
 
+function addList(name) {
+    const list = {id: list_id, name: name};
+
+    lists.push(list);
+    list_id++;
+
+    const row = Object.values(list).join(',') + '\n';
+    fs.appendFileSync(LIST_FILE, row, 'utf-8');
 }
 
 function deleteItem(id) {
@@ -50,8 +78,11 @@ function deleteItem(id) {
     writeToFile();
 }
 
-function addCategory(name) {
-    categories.push(name);
+function deleteList(id) {
+    lists = lists.filter(list => list.id != id);
+
+    const rows = lists.map(item => Object.values(item).join(',')).join('\n');
+    fs.writeFileSync(LIST_FILE, LIST_HEADERS + '\n' + rows + '\n', 'utf-8');    
 }
 
 function updateStatus(id) {
@@ -100,7 +131,7 @@ function sortBy(option) {
 
 function updateItem(id, field, newValue) {
     items.forEach(item => {
-        if (item.id === id) {
+        if (item.id == id) {
             item[field] = newValue;
         }
     });
@@ -109,7 +140,7 @@ function updateItem(id, field, newValue) {
 }
 
 function updateItems() {
-    const updatedFileData = fs.readFileSync(FILE, 'utf-8');
+    const updatedFileData = fs.readFileSync(ITEM_FILE, 'utf-8');
 
     const updatedLines = updatedFileData.trim().split(/\r?\n/);
 
@@ -125,15 +156,34 @@ function updateItems() {
     })
 }
 
+function updateLists() {
+    const updatedFileData = fs.readFileSync(LIST_FILE, 'utf-8');
+
+    const updatedLines = updatedFileData.trim().split(/\r?\n/);
+
+    lists = updatedLines.slice(1).map(line => {
+        const values = line.split(',').map(value => value.trim());
+        const obj = {};
+
+        LIST_HEADERS.forEach((header, index) => {
+            obj[header] = values[index];
+        });
+
+        return obj;
+    })
+}
+
 module.exports = {
     HEADERS,
     getItems,
+    getLists,
     addItem,
-    addCategory,
     updateStatus,
     updateUrgent,
     sortBy,
     updateItems,
     deleteItem,
+    deleteList,
     updateItem,
+    addList,
 }
