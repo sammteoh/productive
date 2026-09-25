@@ -79,8 +79,9 @@ function writeToFile() {
 }
 
 function writeListsToFile() {
-    const rows = lists.map(item => Object.values(item).join(',')).join('\n');
-    fs.writeFileSync(LIST_FILE, LIST_HEADERS + '\n' + rows + '\n', 'utf-8');    
+    const rows = lists.map(list => Object.values(list).join(',')).join('\n');
+    fs.writeFileSync(LIST_FILE, LIST_HEADERS + '\n' + rows + '\n', 'utf-8');   
+    cleanCsvFile(LIST_FILE); 
 }
 
 function addItem(name, list, date=null, status="incomplete", urgent="nonurgent") {
@@ -219,6 +220,7 @@ function updateLists() {
 module.exports = {
     HEADERS,
     LIST_HEADERS,
+    DEFAULT_LIST,
     getItems,
     getLists,
     addItem,

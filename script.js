@@ -1,4 +1,4 @@
-const { HEADERS, LIST_HEADERS, getItems, getLists, addItem, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, deleteList, updateItem, addList } = require('./csvManager');
+const { DEFAULT_LIST, HEADERS, LIST_HEADERS, getItems, getLists, addItem, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, deleteList, updateItem, addList } = require('./csvManager');
 
 let lists = getLists();
 
@@ -252,17 +252,18 @@ function renderPage() {
 
         const listHeading = document.createElement('h2');
         listHeading.textContent = `${list.name.toUpperCase()}`;
-
-        const deleteButton = document.createElement('button');
         
-        deleteButton.textContent = 'x';
-        deleteButton.addEventListener('click', () => {
-            deleteList(list.id);
-            renderPage();
-        });
+        if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLocaleUpperCase()) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete List';
+            deleteButton.addEventListener('click', () => {
+                deleteList(list.id);
+                renderPage();
+            });
+            listContainer.appendChild(deleteButton);
+        }
 
         listContainer.appendChild(listHeading);
-        listContainer.appendChild(deleteButton);
 
         tableContainer.appendChild(listContainer);
 
