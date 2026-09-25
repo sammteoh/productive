@@ -14,6 +14,12 @@ function renderButtons(containerId) {
         placeholder: 'Enter item.'
     });
 
+    const noteInput = Object.assign(document.createElement('input'), {
+        id: 'note-input',
+        type: 'text',
+        placeholder: 'Enter notes.'
+    })
+
     const listSelect = document.createElement('select');
     listSelect.id = 'list-select';
 
@@ -35,16 +41,16 @@ function renderButtons(containerId) {
         textContent: 'Add'
     });
 
-
     addButton.addEventListener('click', () => {
         if (itemInput.value == "" || listSelect.value == "") {
             throw new Error("Invalid input.")
         }
 
-        addItem(itemInput.value, listSelect.value, dateSelect.value);
+        addItem(itemInput.value, listSelect.value, noteInput.value, dateSelect.value);
         sortBy("date");
         renderPage();
         itemInput.value = "";
+        noteInput.value = "";
     });
 
     // Adding a new list button container
@@ -77,6 +83,7 @@ function renderButtons(containerId) {
     addItemButtonContainer.appendChild(itemInput);
     addItemButtonContainer.appendChild(listSelect);
     addItemButtonContainer.appendChild(dateSelect);
+    addItemButtonContainer.appendChild(noteInput);
     addItemButtonContainer.appendChild(addButton);
 
     addListButtonContainer.appendChild(listInput);
@@ -173,7 +180,7 @@ function renderTable(tableItems, containerId) {
                 });
 
                 cell.appendChild(checkUrgentInput);    
-            } else if (header == "name" || header == "date") {
+            } else if (header == "name" || header == "date" || header == "notes") {
                 cell.textContent = value
                 
                 cell.addEventListener('click', function makeEditable() {

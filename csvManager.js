@@ -10,7 +10,7 @@ const listFileData = fs.readFileSync(LIST_FILE, 'utf-8');
 const lines = itemFileData.trim().split(/\r?\n/);
 const listLines = listFileData.trim().split(/\r?\n/);
 
-const HEADERS = ['id', 'name', 'status', 'urgent', 'list', 'date'];
+const HEADERS = ['id', 'name', 'status', 'urgent', 'list', 'date', 'notes'];
 const LIST_HEADERS = ['id', 'name'];
 
 function readCsv(filename, headers) {
@@ -84,8 +84,8 @@ function writeListsToFile() {
     cleanCsvFile(LIST_FILE); 
 }
 
-function addItem(name, list, date=null, status="incomplete", urgent="nonurgent") {
-    const item = {id: item_id, name: name, status: status, urgent: urgent, list: list, date: date};
+function addItem(name, list, notes="", date=null, status="incomplete", urgent="nonurgent") {
+    const item = {id: item_id, name: name, status: status, urgent: urgent, list: list, date: date, notes: notes };
 
     items.push(item);
     item_id++;
