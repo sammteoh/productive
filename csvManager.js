@@ -1,8 +1,6 @@
-let item_id = 0;
-let list_id = 0;
-
 const ITEM_FILE = 'items.csv';
 const LIST_FILE = 'lists.csv';
+const DEFAULT_LIST = { id: 0, name: 'Uncategorized' };
 
 const fs = require('fs');
 
@@ -21,6 +19,8 @@ function readCsv(filename, headers) {
         return [];
     }
 
+    cleanCsvFile(filename);
+
     const fileData = fs.readFileSync(filename, 'utf-8');
     const lines = fileData.trim().split(/\r?\n/).filter(line => line.trim() !== '');
 
@@ -34,8 +34,28 @@ function readCsv(filename, headers) {
     });
 }
 
+function cleanCsvFile(filename) {
+    const data = fs.readFileSync(filename, 'utf-8');
+
+    const cleanedData = data
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0 && line.replace(/,/g, '') !== '');
+    
+    fs.writeFileSync(filename, cleanedData.join('\n') + '\n', 'utf-8');
+}
+
 let items = readCsv(ITEM_FILE, HEADERS);
 let lists = readCsv(LIST_FILE, LIST_HEADERS);
+
+function getNextId(objects) {
+    if (objects.length === 0) return 0;
+    const maxId = Math.max(...objects.map(item => parseInt(item.id)));
+    return maxId + 1;
+}
+
+let item_id = getNextId(items);
+let list_id = getNextId(lists);
 
 function getItems() {
     updateItems();
@@ -44,12 +64,23 @@ function getItems() {
 
 function getLists() {
     updateLists();
+
+    const exists = lists.some(list => list.name.toLowerCase() === DEFAULT_LIST.name.toLocaleLowerCase());
+    if (!exists) {
+        return [DEFAULT_LIST, ...lists];
+    }
+
     return lists;
 }
 
 function writeToFile() {
     const rows = items.map(item => Object.values(item).join(',')).join('\n');
     fs.writeFileSync(ITEM_FILE, HEADERS + '\n' + rows + '\n', 'utf-8');    
+}
+
+function writeListsToFile() {
+    const rows = lists.map(item => Object.values(item).join(',')).join('\n');
+    fs.writeFileSync(LIST_FILE, LIST_HEADERS + '\n' + rows + '\n', 'utf-8');    
 }
 
 function addItem(name, list, date=null, status="incomplete", urgent="nonurgent") {
@@ -79,10 +110,22 @@ function deleteItem(id) {
 }
 
 function deleteList(id) {
-    lists = lists.filter(list => list.id != id);
+    const listToDelete = lists.find(list => list.id == id);
+    if (!listToDelete) return;
 
-    const rows = lists.map(item => Object.values(item).join(',')).join('\n');
-    fs.writeFileSync(LIST_FILE, LIST_HEADERS + '\n' + rows + '\n', 'utf-8');    
+    if (listToDelete.name.toLowerCase() === DEFAULT_LIST.name.toLowerCase()) {
+        return;
+    }
+
+    lists = lists.filter(list => list.id != id);
+    writeListsToFile();
+
+    items.forEach(item => {
+        if (item.list.toLowerCase() === listToDelete.name.toLowerCase()) {
+            item.list = DEFAULT_LIST.name.toLowerCase();
+        }
+    });
+    writeToFile();
 }
 
 function updateStatus(id) {
@@ -175,6 +218,7 @@ function updateLists() {
 
 module.exports = {
     HEADERS,
+    LIST_HEADERS,
     getItems,
     getLists,
     addItem,

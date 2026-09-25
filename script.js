@@ -1,4 +1,4 @@
-const { HEADERS, getItems, getLists, addItem, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, deleteList, updateItem, addList } = require('./csvManager');
+const { HEADERS, LIST_HEADERS, getItems, getLists, addItem, updateStatus, updateUrgent, sortBy, updateItems, deleteItem, deleteList, updateItem, addList } = require('./csvManager');
 
 let lists = getLists();
 
