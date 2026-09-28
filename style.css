@@ -20,3 +20,18 @@ body {
     align-items: center;
 }
 
+#list-input {
+    margin: 10px;
+    padding: 8px;
+
+    /* Border */
+    border-radius: 8px;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.list {
+    border-top: 1px solid #d3d3d3;
+    margin-top: 20px;
+}
+

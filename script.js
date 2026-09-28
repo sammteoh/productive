@@ -62,6 +62,15 @@ function renderButtons(containerId) {
         placeholder: 'Enter list.'
     });
 
+    listInput.addEventListener('keydown', (e) => {
+        if (e.key == 'Enter') {
+            addList(listInput.value);
+            lists = getLists();
+            renderPage();
+            listInput.value = "";
+        }
+    })
+
     const addListButton = Object.assign(document.createElement('button'), {
         id: 'add-list-button',
         type: 'button',
@@ -88,7 +97,7 @@ function renderButtons(containerId) {
     */
 
     addListButtonContainer.appendChild(listInput);
-    addListButtonContainer.appendChild(addListButton);
+    //addListButtonContainer.appendChild(addListButton);
 
     buttonContainer.appendChild(addItemButtonContainer);
     buttonContainer.appendChild(addListButtonContainer);
@@ -152,9 +161,11 @@ function renderTable(tableItems, containerId) {
     const container = document.getElementById(containerId);
     
     HEADERS.forEach(header => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        headerRow.appendChild(th);
+        if (header !== 'id' && header !== 'list') {
+            const th = document.createElement("th");
+            th.textContent = header;
+            headerRow.appendChild(th);
+        }
     });
 
     const deleteHeader = document.createElement('th');
@@ -166,70 +177,73 @@ function renderTable(tableItems, containerId) {
         const row = document.createElement('tr');
 
         HEADERS.forEach(header => {
-            const cell = document.createElement('td');
-            const value = item[header];
+            if (header !== 'id' && header !== 'list') {
+                const cell = document.createElement('td');
+                const value = item[header];
 
-            if (header == "status") {
-                const checkStatusInput = document.createElement("input");
-                checkStatusInput.type = "checkbox";
-                checkStatusInput.checked = (item.status === "complete");
+                if (header == "status") {
+                    const checkStatusInput = document.createElement("input");
+                    checkStatusInput.type = "checkbox";
+                    checkStatusInput.checked = (item.status === "complete");
 
-                checkStatusInput.addEventListener('change', (e) => {
-                    updateStatus(item.id);
-                    sortBy("date");
-                    renderPage();
-                });
-
-                cell.appendChild(checkStatusInput);
-            } else if (header == "urgent") {
-                const checkUrgentInput = document.createElement("input");
-                checkUrgentInput.type = "checkbox";
-                checkUrgentInput.checked = (item.urgent === "urgent");
-
-                checkUrgentInput.addEventListener('change', (e) => {
-                    updateUrgent(item.id);
-                    sortBy('date');
-                    renderPage();
-                });
-
-                cell.appendChild(checkUrgentInput);    
-            } else if (header == "name" || header == "date" || header == "notes") {
-                cell.textContent = value
-                
-                cell.addEventListener('click', function makeEditable() {
-                    if (cell.querySelector('input')) return;
-
-                    const input = document.createElement('input');
-                    input.type = (header === "date") ? "date" : "text";
-                    input.value = value
-
-                    cell.textContent = "";
-                    cell.appendChild(input);
-                    input.focus();
-
-                    const saveChange = () => {
-                        const newValue = input.value.trim();
-                        if (newValue !== value) {
-                            updateItem(item.id, header, newValue);
-                            sortBy("date");
-                        }
+                    checkStatusInput.addEventListener('change', (e) => {
+                        updateStatus(item.id);
+                        sortBy("date");
                         renderPage();
-                    };
-
-                    input.addEventListener('blur', saveChange);
-                    input.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter') {
-                            input.blur();
-                        }
                     });
-                });
 
-            } else {
-                cell.textContent = value;
+                    cell.appendChild(checkStatusInput);
+                } else if (header == "urgent") {
+                    const checkUrgentInput = document.createElement("input");
+                    checkUrgentInput.type = "checkbox";
+                    checkUrgentInput.checked = (item.urgent === "urgent");
+
+                    checkUrgentInput.addEventListener('change', (e) => {
+                        updateUrgent(item.id);
+                        sortBy('date');
+                        renderPage();
+                    });
+
+                    cell.appendChild(checkUrgentInput);    
+                } else if (header == "name" || header == "date" || header == "notes") {
+                    cell.textContent = value
+                    
+                    cell.addEventListener('click', function makeEditable() {
+                        if (cell.querySelector('input')) return;
+
+                        const input = document.createElement('input');
+                        input.type = (header === "date") ? "date" : "text";
+                        input.value = value
+
+                        cell.textContent = "";
+                        cell.appendChild(input);
+                        input.focus();
+
+                        const saveChange = () => {
+                            const newValue = input.value.trim();
+                            if (newValue !== value) {
+                                updateItem(item.id, header, newValue);
+                                sortBy("date");
+                            }
+                            renderPage();
+                        };
+
+                        input.addEventListener('blur', saveChange);
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                input.blur();
+                            }
+                        });
+                    });
+
+                } else {
+                    cell.textContent = value;
+                }
+
+                row.appendChild(cell);
             }
 
-            row.appendChild(cell);
-        })
+        });
 
         const deleteCell = document.createElement('td');
         const deleteButton = document.createElement('button');
@@ -269,6 +283,7 @@ function renderPage() {
     lists.forEach(list => {
         const listContainer = document.createElement('div');
         listContainer.id = `${list.name.toLowerCase()}-container`;
+        listContainer.classList.add("list");
 
         if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLowerCase()) {
             const listHeading = document.createElement('h2');
