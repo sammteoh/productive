@@ -79,12 +79,13 @@ function renderButtons(containerId) {
         listInput.value = "";
     });
 
-
+    /*
     addItemButtonContainer.appendChild(itemInput);
     addItemButtonContainer.appendChild(listSelect);
     addItemButtonContainer.appendChild(dateSelect);
     addItemButtonContainer.appendChild(noteInput);
     addItemButtonContainer.appendChild(addButton);
+    */
 
     addListButtonContainer.appendChild(listInput);
     addListButtonContainer.appendChild(addListButton);
@@ -97,10 +98,24 @@ function renderButtons(containerId) {
 function renderFullTable(list, containerId) {
     const container = document.getElementById(containerId);
 
-    const listItems = getItems().filter(item => item.list == list.name.toLowerCase());
+    const listItems = getItems().filter(item => item.list.toLowerCase() == list.name.toLowerCase());
 
     const completeItems = listItems.filter(item => item.status == "complete");
     const incompleteItems = listItems.filter(item => item.status == "incomplete");
+
+    const incompleteContainer = document.createElement('div');
+    incompleteContainer.id = `${list.name.toLowerCase()}-incomplete-container`;
+
+    const addNewBtn = document.createElement('button');
+    addNewBtn.textContent = "New";
+
+    addNewBtn.addEventListener('click', () => {
+        addItem("", list.name, "");
+        sortBy("date");
+        renderPage();
+    })
+
+    console.log(getItems());
 
     const completeContainer = document.createElement('div');
     completeContainer.id = `${list.name.toLowerCase()}-complete-container`;
@@ -120,12 +135,10 @@ function renderFullTable(list, containerId) {
         }
     })
 
-    const incompleteContainer = document.createElement('div');
-    incompleteContainer.id = `${list.name.toLowerCase()}-incomplete-container`;
-
     container.appendChild(incompleteContainer);
-    container.appendChild(completeContainer);
-    container.appendChild(completeToggleBtn);       
+    container.appendChild(addNewBtn);
+    container.appendChild(completeContainer);    
+    container.appendChild(completeToggleBtn);   
 
     renderTable(completeItems, completeContainer.id);
     renderTable(incompleteItems, incompleteContainer.id);
@@ -257,10 +270,13 @@ function renderPage() {
         const listContainer = document.createElement('div');
         listContainer.id = `${list.name.toLowerCase()}-container`;
 
-        const listHeading = document.createElement('h2');
-        listHeading.textContent = `${list.name.toUpperCase()}`;
+        if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLowerCase()) {
+            const listHeading = document.createElement('h2');
+            listHeading.textContent = `${list.name.toUpperCase()}`;
+            listContainer.appendChild(listHeading);
+        }
         
-        if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLocaleUpperCase()) {
+        if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLowerCase()) {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Delete List';
             deleteButton.addEventListener('click', () => {
@@ -269,8 +285,6 @@ function renderPage() {
             });
             listContainer.appendChild(deleteButton);
         }
-
-        listContainer.appendChild(listHeading);
 
         tableContainer.appendChild(listContainer);
 

@@ -92,6 +92,8 @@ function addItem(name, list, notes="", date=null, status="incomplete", urgent="n
 
     const row = Object.values(item).join(',') + '\n';
     fs.appendFileSync(ITEM_FILE, row, 'utf-8');
+
+    console.log(items);
 }
 
 function addList(name) {

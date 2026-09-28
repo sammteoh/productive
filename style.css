@@ -1,0 +1,22 @@
+:root {
+    --bg-page: #f8f9fa;
+
+}
+
+* {
+}
+
+body {
+    background-color: var(--bg-page);
+    
+    display: flex;
+    justify-content: center;
+}
+
+#container {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
