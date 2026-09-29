@@ -116,7 +116,8 @@ function renderFullTable(list, containerId) {
     incompleteContainer.id = `${list.name.toLowerCase()}-incomplete-container`;
 
     const addNewBtn = document.createElement('button');
-    addNewBtn.textContent = "New";
+    addNewBtn.id = 'add-item-button';
+    addNewBtn.textContent = "";
 
     addNewBtn.addEventListener('click', () => {
         addItem("", list.name, "");
@@ -128,9 +129,11 @@ function renderFullTable(list, containerId) {
 
     const completeContainer = document.createElement('div');
     completeContainer.id = `${list.name.toLowerCase()}-complete-container`;
+    completeContainer.style.display = "none";
 
     const completeToggleBtn = document.createElement('button');
-    completeToggleBtn.textContent = `Hide Completed (${completeItems.length})`
+    completeToggleBtn.textContent = `Show Completed (${completeItems.length})`
+    completeToggleBtn.id = 'complete-toggle-button'
 
     completeToggleBtn.addEventListener('click', () => {
         const isHidden = completeContainer.style.display === "none";
@@ -145,28 +148,32 @@ function renderFullTable(list, containerId) {
     })
 
     container.appendChild(incompleteContainer);
-    container.appendChild(addNewBtn);
-    container.appendChild(completeContainer);    
+    container.appendChild(completeContainer); 
+    container.appendChild(addNewBtn);   
     container.appendChild(completeToggleBtn);   
 
-    renderTable(completeItems, completeContainer.id);
+    renderTable(completeItems, completeContainer.id, true);
     renderTable(incompleteItems, incompleteContainer.id);
 }
 
-function renderTable(tableItems, containerId) {
+function renderTable(tableItems, containerId, complete=false) {
     const table = document.createElement("table");
 
     const headerRow = document.createElement("tr");
 
     const container = document.getElementById(containerId);
     
-    HEADERS.forEach(header => {
-        if (header !== 'id' && header !== 'list') {
-            const th = document.createElement("th");
-            th.textContent = header;
-            headerRow.appendChild(th);
-        }
-    });
+    if (!complete) {    
+        HEADERS.forEach(header => {
+            if (header !== 'id' && header !== 'list') {
+                    const th = document.createElement("th");
+                    if (header !== 'status') {
+                        th.textContent = header;
+                    }
+                    headerRow.appendChild(th);
+                }
+            });
+    }
 
     const deleteHeader = document.createElement('th');
     headerRow.appendChild(deleteHeader);
@@ -207,6 +214,7 @@ function renderTable(tableItems, containerId) {
                     cell.appendChild(checkUrgentInput);    
                 } else if (header == "name" || header == "date" || header == "notes") {
                     cell.textContent = value
+                    cell.classList.add('clickable');
                     
                     cell.addEventListener('click', function makeEditable() {
                         if (cell.querySelector('input')) return;
