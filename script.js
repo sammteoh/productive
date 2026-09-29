@@ -134,6 +134,7 @@ function renderFullTable(list, containerId) {
     const completeToggleBtn = document.createElement('button');
     completeToggleBtn.textContent = `Show Completed (${completeItems.length})`
     completeToggleBtn.id = 'complete-toggle-button'
+    completeToggleBtn.classList.add('button');
 
     completeToggleBtn.addEventListener('click', () => {
         const isHidden = completeContainer.style.display === "none";
@@ -150,7 +151,19 @@ function renderFullTable(list, containerId) {
     container.appendChild(incompleteContainer);
     container.appendChild(completeContainer); 
     container.appendChild(addNewBtn);   
-    container.appendChild(completeToggleBtn);   
+    container.appendChild(completeToggleBtn);
+
+    if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLowerCase()) {
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('button');
+        deleteButton.textContent = 'Delete List';
+        deleteButton.addEventListener('click', () => {
+            deleteList(list.id);
+            renderPage();
+        });
+        container.appendChild(deleteButton);
+    }
+    
 
     renderTable(completeItems, completeContainer.id, true);
     renderTable(incompleteItems, incompleteContainer.id);
@@ -255,6 +268,7 @@ function renderTable(tableItems, containerId, complete=false) {
 
         const deleteCell = document.createElement('td');
         const deleteButton = document.createElement('button');
+        deleteButton.id = 'delete-button'
 
         deleteButton.textContent = 'x';
         deleteButton.addEventListener('click', () => {
@@ -298,16 +312,7 @@ function renderPage() {
             listHeading.textContent = `${list.name.toUpperCase()}`;
             listContainer.appendChild(listHeading);
         }
-        
-        if (list.name.toLowerCase() !== DEFAULT_LIST.name.toLowerCase()) {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete List';
-            deleteButton.addEventListener('click', () => {
-                deleteList(list.id);
-                renderPage();
-            });
-            listContainer.appendChild(deleteButton);
-        }
+    
 
         tableContainer.appendChild(listContainer);
 

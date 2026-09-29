@@ -41,15 +41,26 @@ body {
     cursor: pointer;
 }
 
-#complete-toggle-button {
+.button {
     border: none;
     background: transparent;
     color: #8d8b8b;
 }
 
-#complete-toggle-button:hover {
+.button:hover {
     cursor: pointer;
     color:#000000;
+}
+
+#delete-button {
+    border: none;
+    background: transparent;
+    color: #8d8b8b;
+}
+
+#delete-button:hover {
+    cursor: pointer;
+    color: #000000;
 }
 
 

@@ -1,4 +1,2 @@
 id,status,name,urgent,list,date,notes
 1,incomplete,Something interesting,nonurgent,Uncategorized,2026-09-24,Something else interesting
-0,complete,Complete homework,nonurgent,Uncategorized,2026-09-30,
-2,incomplete,,nonurgent,Uncategorized,,
